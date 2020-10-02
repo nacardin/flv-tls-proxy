@@ -29,7 +29,7 @@ const ITER: u16 = 10;
 
 /// run using native tls
 #[test_async]
-async fn test_proxy_native() -> Result<(), IoError> {
+async fn test_native() -> Result<(), IoError> {
     use std::fs::File;
     use std::io::Read;
 

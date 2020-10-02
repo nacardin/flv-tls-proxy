@@ -27,7 +27,7 @@ const PROXY: &str = "127.0.0.1:20000";
 const ITER: u16 = 10;
 
 #[test_async]
-async fn test_proxy() -> Result<(), IoError> {
+async fn test_rustls() -> Result<(), IoError> {
     test_tls(
         AcceptorBuilder::new_no_client_authentication()
             .load_server_certs("certs/certs/server.crt", "certs/certs/server.key")?
