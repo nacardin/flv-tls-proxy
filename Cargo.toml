@@ -1,6 +1,6 @@
 [package]
 name = "flv-tls-proxy"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2018"
 authors = ["Fluvio Contributors <team@fluvio.io>"]
 description = "Simple Local TLS Proxy"
@@ -8,12 +8,16 @@ repository = "https://github.com/infinyon/flv-tls-proxy"
 license = "Apache-2.0"
 categories = ["encoding"]
 
+[features]
+rustls = ["fluvio-future/tls"]
 
 [dependencies]
 log = "0.4.8"
+async-native-tls = "0.3.3"
+native-tls = "0.2.4"
 futures-lite = { version = "1.7.0" }
 futures-util = { version = "0.3.5", features = ["sink","io"]}
-fluvio-future = { version = "0.1.0", features = ["tls","net","task"] }
+fluvio-future = { version = "0.1.0", features = ["net","task"] }
 pin-project-lite = "0.1.0"
 
 [dev-dependencies]
@@ -24,5 +28,3 @@ async-lock = "1.1.0"
 tokio-util = { version = "0.3.1", features = ["codec", "compat"] }
 flv-util = { version = "0.5.0", features = ["fixture"] }
 fluvio-future = {  version = "0.1.0", features = ["net", "fixture", "timer", "fs"] }
-async-native-tls = "0.3.3"
-native-tls = "0.2.4"

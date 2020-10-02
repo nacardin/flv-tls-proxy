@@ -1,10 +1,12 @@
 use std::io::Error as IoError;
 
+use async_native_tls::TlsAcceptor;
+use async_native_tls::TlsStream;
+
+
 use fluvio_future::net::TcpListener;
 use fluvio_future::net::TcpStream;
 use fluvio_future::task::spawn;
-use fluvio_future::tls::DefaultServerTlsStream;
-use fluvio_future::tls::TlsAcceptor;
 use futures_lite::io::copy;
 
 use futures_util::io::AsyncReadExt;
@@ -53,12 +55,10 @@ async fn process_stream(acceptor: TlsAcceptor, raw_stream: TcpStream, target: St
 }
 
 async fn proxy(
-    tls_stream: DefaultServerTlsStream,
+    tls_stream: TlsStream<TcpStream>,
     target: String,
     source: String,
 ) -> Result<(), IoError> {
-    use futures_lite::future::zip;
-
     debug!(
         "trying to connect to target at: {} from source: {}",
         target, source
@@ -69,12 +69,12 @@ async fn proxy(
     let mut target_sink = tcp_stream.clone();
 
     //let (mut target_stream, mut target_sink) = tcp_stream.split();
-    let (mut from_tls_stream, mut from_tls_sink) = tls_stream.split();
+    let (from_tls_stream, mut from_tls_sink) = tls_stream.split();
 
     let s_t = format!("{}->{}", source, target);
     let t_s = format!("{}->{}", target, source);
-    let source_to_target_ft = async {
-        match copy(&mut from_tls_stream, &mut target_sink).await {
+    let source_to_target_ft = async move {
+        match copy(from_tls_stream, &mut target_sink).await {
             Ok(len) => {
                 debug!("{} copy from source to target: len {}", s_t, len);
             }
@@ -84,7 +84,7 @@ async fn proxy(
         }
     };
 
-    let target_to_source = async {
+    let target_to_source = async move {
         match copy(&mut tcp_stream, &mut from_tls_sink).await {
             Ok(len) => {
                 debug!("{} copy from target: len {}", t_s, len);
@@ -95,7 +95,8 @@ async fn proxy(
         }
     };
 
-    zip(source_to_target_ft, target_to_source).await;
+    spawn(source_to_target_ft);
+    spawn(target_to_source);
 
     Ok(())
 }
