@@ -44,6 +44,13 @@ generate-server-crt:	generate-server-csr
 		-extfile openssl.cnf
 
 
+# convert server cert to pk12
+generate-server-pk12:
+	openssl pkcs12 -export -out certs/server.pfx -inkey certs/server.key -in certs/server.crt -certfile  certs/ca.crt -passout pass:test
+
+
+
+
 generate-client-key:
 	openssl genrsa -out certs/client.key 4096
 
@@ -58,6 +65,8 @@ generate-client-crt:	generate-client-csr
 		-CA certs/ca.crt -CAkey certs/ca.key -CAcreateserial \
 		-extensions v3_end \
 		-extfile openssl.cnf
+
+
 
 
 

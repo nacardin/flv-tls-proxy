@@ -24,3 +24,5 @@ async-lock = "1.1.0"
 tokio-util = { version = "0.3.1", features = ["codec", "compat"] }
 flv-util = { version = "0.5.0", features = ["fixture"] }
 fluvio-future = {  version = "0.1.0", features = ["net", "fixture", "timer", "fs"] }
+async-native-tls = "0.3.3"
+native-tls = "0.2.4"
